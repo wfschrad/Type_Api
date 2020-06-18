@@ -223,6 +223,7 @@ module.exports = {
       {
         typeAttributeId: 3,
         content: "believe a 'good' decision takes other people's feelings into account.",
+        scoringScalar: -1,
         createdAt: new Date(),
         updatedAt: new Date()
       },
