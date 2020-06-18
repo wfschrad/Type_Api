@@ -1,15 +1,21 @@
 const express = require('express');
 const morgan = require("morgan");
-
-const app = express();
-const { requiresAuth } = require('./utils/auth');
-
+const graphqlHTTP = require('express-graphql');
 const cors = require('cors');
 
-app.use(cors({ origin: 'http://localhost:3000' }));
+const { requiresAuth } = require('./utils/auth');
+const schema = require('./schema');
 
+const app = express();
 
-const port = process.env.PORT || 8080;
+app.use(cors({ origin: true })); // make more restrictive for production
+
+app.use('/graphql', graphqlHTTP({
+    schema,
+    graphiql: true
+}));
+
+// const port = process.env.PORT || 8080;
 
 
 
