@@ -17,6 +17,7 @@ const { resolveFieldValueOrError } = require('graphql/execution/execute');
 const TypingQuestionType = new GraphQLObjectType({
     name: 'TypingQuestion',
     fields: () => ({
+        id: { type: GraphQLInt },
         typeAttributeId: { type: GraphQLInt },
         content: { type: GraphQLString },
         scoringScalar: { type: GraphQLInt }
@@ -31,11 +32,9 @@ const RootQuery = new GraphQLObjectType({
         typingQuestions: {
             type: new GraphQLList(TypingQuestionType),
             async resolve(parent, args) {
-                console.log('begin resolver')
                 const questions = await TypingQuestion.findAll({
                     attributes: ['id', 'typeAttributeId', 'content', 'scoringScalar']
                 });
-                console.log('questions in "typingQuestions resolver: ', questions);
                 return questions;
             }
         }
