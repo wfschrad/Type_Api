@@ -3,7 +3,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('TypeAttributes', [
-      { name: 'IE_Att', createdAt: new Date(), updatedAt: new Date() },
+      { name: 'EI_Att', createdAt: new Date(), updatedAt: new Date() },
       { name: 'NS_Att', createdAt: new Date(), updatedAt: new Date() },
       { name: 'FT_Att', createdAt: new Date(), updatedAt: new Date() },
       { name: 'JP_Att', createdAt: new Date(), updatedAt: new Date() },

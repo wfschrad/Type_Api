@@ -8,9 +8,9 @@ const {
     GraphQLString,
     GraphQLBoolean,
     GraphQLList,
+    GraphQLNonNull,
     GraphQLSchema
 } = require('graphql');
-const { resolveFieldValueOrError } = require('graphql/execution/execute');
 
 // TypingQuestion Type
 
@@ -23,6 +23,28 @@ const TypingQuestionType = new GraphQLObjectType({
         scoringScalar: { type: GraphQLInt }
     })
 });
+
+// User Type
+
+const UserType = new GraphQLObjectType({
+    name: 'User',
+    fields: () => ({
+        id: { type: GraphQLInt },
+        firstName: { type: GraphQLString },
+        email: { type: GraphQLString },
+        profilePhoto: { type: GraphQLString },
+        pTypeId: { type: GraphQLInt },
+        currentMatches: { type: GraphQLList(UserType) },
+        pendingMatches: { type: GraphQLList(UserType) },
+        prospects: { type: GraphQLList(UserType) },
+        denials: { type: GraphQLList(UserType) },
+        rawEI: { type: GraphQLInt },
+        rawNS: { type: GraphQLInt },
+        rawFT: { type: GraphQLInt },
+        rawJP: { type: GraphQLInt },
+        isMatchable: { type: GraphQLBoolean }
+    })
+})
 
 // Root Query
 
@@ -40,6 +62,24 @@ const RootQuery = new GraphQLObjectType({
         }
     }
 });
+
+// Root Mutation
+
+const RootMutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        addUser: {
+            type: UserType,
+            args: {
+                firstName: { type: new GraphQLNonNull(GraphQLString) },
+                email: { type: new GraphQLNonNull(GraphQLString) },
+                profilePhoto: { type: new GraphQLNonNull(GraphQLString) },
+                // isMatchable: { type: new GraphQLNonNull(GraphQLBoolean) },
+
+            }
+        }
+    }
+})
 
 module.exports = new GraphQLSchema({
     query: RootQuery
