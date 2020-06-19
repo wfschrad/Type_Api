@@ -1,4 +1,4 @@
-const { TypingQuestion } = require('./models');
+const { TypingQuestion, User } = require('./models');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -66,7 +66,7 @@ const RootQuery = new GraphQLObjectType({
 // Root Mutation
 
 const RootMutation = new GraphQLObjectType({
-    name: 'Mutation',
+    name: 'RootMutationType',
     fields: {
         addUser: {
             type: UserType,
@@ -75,12 +75,23 @@ const RootMutation = new GraphQLObjectType({
                 email: { type: new GraphQLNonNull(GraphQLString) },
                 profilePhoto: { type: new GraphQLNonNull(GraphQLString) },
                 // isMatchable: { type: new GraphQLNonNull(GraphQLBoolean) },
-
+            },
+            async resolve(parentValue, args) {
+                const user = await User.findOrCreate({
+                    where: {
+                        firstName: args.firstName,
+                        email: args.email,
+                        profilePhoto: args.profilePhoto
+                    }
+                });
+                console.log('user in create mutation: ', user);
+                return user[0].dataValues;
             }
-        }
+        },
     }
-})
+});
 
 module.exports = new GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation: RootMutation
 });
