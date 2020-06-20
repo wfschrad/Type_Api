@@ -91,6 +91,10 @@ const RootMutation = new GraphQLObjectType({
                 return user[0].dataValues;
             }
         },
+        // editUser : {
+        //     type: UserType,
+        //     args:
+        // }
     }
 });
 
