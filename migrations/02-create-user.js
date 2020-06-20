@@ -17,6 +17,11 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true
       },
+      auth0Id: {
+        allowNull: false,
+        type: Sequelize.STRING,
+        unique: true
+      },
       profilePhoto: {
         allowNull: false,
         type: Sequelize.STRING

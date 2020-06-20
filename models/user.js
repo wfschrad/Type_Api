@@ -3,6 +3,7 @@ module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     firstName: DataTypes.STRING,
     email: DataTypes.STRING,
+    auth0Id: DataTypes.STRING,
     profilePhoto: DataTypes.STRING,
     pTypeId: DataTypes.INTEGER,
     currentMatches: DataTypes.ARRAY(DataTypes.INTEGER),
@@ -15,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     rawJP: DataTypes.INTEGER,
     isMatchable: DataTypes.BOOLEAN
   }, {});
-  User.associate = function(models) {
+  User.associate = function (models) {
     // associations can be defined here
   };
   return User;

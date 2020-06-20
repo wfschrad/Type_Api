@@ -32,6 +32,7 @@ const UserType = new GraphQLObjectType({
         id: { type: GraphQLInt },
         firstName: { type: GraphQLString },
         email: { type: GraphQLString },
+        auth0Id: { type: GraphQLString },
         profilePhoto: { type: GraphQLString },
         pTypeId: { type: GraphQLInt },
         currentMatches: { type: GraphQLList(UserType) },
@@ -73,6 +74,7 @@ const RootMutation = new GraphQLObjectType({
             args: {
                 firstName: { type: new GraphQLNonNull(GraphQLString) },
                 email: { type: new GraphQLNonNull(GraphQLString) },
+                auth0Id: { type: new GraphQLNonNull(GraphQLString) },
                 profilePhoto: { type: new GraphQLNonNull(GraphQLString) },
                 // isMatchable: { type: new GraphQLNonNull(GraphQLBoolean) },
             },
@@ -81,6 +83,7 @@ const RootMutation = new GraphQLObjectType({
                     where: {
                         firstName: args.firstName,
                         email: args.email,
+                        auth0Id: args.auth0Id,
                         profilePhoto: args.profilePhoto
                     }
                 });
