@@ -5,6 +5,7 @@ const cors = require('cors');
 
 const { requiresAuth } = require('./utils/auth');
 const schema = require('./schema');
+const imageRouter = require('./routes/image-upload');
 
 const app = express();
 
@@ -14,6 +15,8 @@ app.use('/graphql', graphqlHTTP({
     schema,
     graphiql: true
 }));
+
+app.use('/aws', imageRouter);
 
 // const port = process.env.PORT || 8080;
 

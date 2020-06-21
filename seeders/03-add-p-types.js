@@ -23,7 +23,7 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete('TypingQuestions', null, {});
+    return queryInterface.bulkDelete('PTypes', null, {});
 
     /*
       Add reverting commands here.
