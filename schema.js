@@ -91,10 +91,33 @@ const RootMutation = new GraphQLObjectType({
                 return user[0].dataValues;
             }
         },
-        // editUser : {
-        //     type: UserType,
-        //     args:
-        // }
+        onBoardUser: {
+            type: UserType,
+            args: {
+                firstName: { type: new GraphQLNonNull(GraphQLString) },
+                email: { type: new GraphQLNonNull(GraphQLString) },
+                gender: { type: new GraphQLNonNull(GraphQLString) },
+                age: { type: new GraphQLNonNull(GraphQLInt) },
+                bio: { type: new GraphQLNonNull(GraphQLString) },
+                rawEI: { type: new GraphQLNonNull(GraphQLString) },
+                rawNS: { type: new GraphQLNonNull(GraphQLString) },
+                rawFT: { type: new GraphQLNonNull(GraphQLString) },
+                rawJP: { type: new GraphQLNonNull(GraphQLString) },
+
+                // isMatchable: { type: new GraphQLNonNull(GraphQLBoolean) },
+            },
+            async resolve(parentValue, args) {
+                const user = await User.findOne({
+                    where: {
+                        email: args.email,
+                    }
+                });
+                await user.update({ ...args, isMatchable: true });
+                console.log('user in create mutation: ', user);
+
+                return user;
+            }
+        },
     }
 });
 
