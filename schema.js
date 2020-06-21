@@ -112,7 +112,15 @@ const RootMutation = new GraphQLObjectType({
                         email: args.email,
                     }
                 });
-                await user.update({ ...args, isMatchable: true });
+
+                // Calculate pTypeId
+
+                let pTypeId = 1;
+                if (args.rawJP >= 0) pTypeId += 1;
+                if (args.rawFT >= 0) pTypeId += 2;
+                if (args.rawNS >= 0) pTypeId += 4;
+                if (args.rawEI >= 0) pTypeId += 8;
+                await user.update({ ...args, isMatchable: true, pTypeId });
                 console.log('user in create mutation: ', user);
 
                 return user;
