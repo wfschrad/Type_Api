@@ -10,9 +10,10 @@ router.post('/image-upload', (req, res) => {
         if (err) {
             console.log('error uploading');
             console.log(err);
-            return res.status(422).send({errors: [{title: 'File format not allowed', detail: err.message}]});
-        } else{
-            return res.json({'imageUrl': req.file.location});
+            return res.status(422).send({ errors: [{ title: 'File format not allowed', detail: err.message }] });
+        } else {
+            console.log('req: ', req)
+            return res.json({ 'imageUrl': req.file.location });
         }
     });
 });
