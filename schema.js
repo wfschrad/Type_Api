@@ -2,6 +2,8 @@ const { TypingQuestion, User, PType } = require('./models');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
+const relMap = require('./utils/mapping');
+
 const {
     GraphQLObjectType,
     GraphQLInt,
@@ -96,6 +98,61 @@ const RootQuery = new GraphQLObjectType({
                     ]
                 });
                 return user;
+            }
+        },
+        prospects: {
+            type: new GraphQLList(UserType),
+            args: {
+                userPTypeId: { type: GraphQLInt },
+                relThresh: { type: GraphQLInt }
+            },
+            async resolve(parent, args) {
+                //build acceptable pTypeId array 
+
+                const mapSlice = relMap[args.userPTypeId];
+                console.log('mapSlice: ', mapSlice)
+                const targetedSlice = mapSlice.slice(args.relThresh);
+                console.log('targetedSlice: ', targetedSlice)
+
+                const spreadTargets = [];
+                targetedSlice.forEach(arr => {
+                    arr.forEach(subArr => spreadTargets.push(...subArr));
+                });
+                console.log('spreadTargets: ', spreadTargets)
+
+                //query db for all users with acceptable pTypeIds
+
+                const prospectPool = await User.findAll({
+                    where: {
+                        pTypeId: { [Op.in]: spreadTargets }
+                    },
+
+                    //     include: [
+                    //     {
+                    //         model: PType,
+                    //         attributes: ['name', 'description']
+                    //     }
+                    // ]
+                });
+
+                return prospectPool;
+
+                //filter prospectPool for current matches or denials
+
+                //return
+
+                // const prospectPool = await User.findA({
+                //     where: {
+                //         email: args.email
+                //     },
+                // include: [
+                //     {
+                //         model: PType,
+                //         attributes: ['name', 'description']
+                //     }
+                // ]
+                // });
+                return prospects;
             }
         },
         pType: {

@@ -13,7 +13,6 @@ module.exports = (sequelize, DataTypes) => {
     pTypeId: DataTypes.INTEGER,
     currentMatches: DataTypes.ARRAY(DataTypes.INTEGER),
     pendingMatches: DataTypes.ARRAY(DataTypes.INTEGER),
-    prospects: DataTypes.ARRAY(DataTypes.INTEGER),
     denials: DataTypes.ARRAY(DataTypes.INTEGER),
     rawEI: DataTypes.INTEGER,
     rawNS: DataTypes.INTEGER,
