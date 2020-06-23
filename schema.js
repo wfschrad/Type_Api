@@ -1,4 +1,4 @@
-const { TypingQuestion, User } = require('./models');
+const { TypingQuestion, User, PType } = require('./models');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -35,6 +35,7 @@ const UserType = new GraphQLObjectType({
         auth0Id: { type: GraphQLString },
         profilePhoto: { type: GraphQLString },
         pTypeId: { type: GraphQLInt },
+        PType: { type: PTypeType },
         currentMatches: { type: GraphQLList(UserType) },
         pendingMatches: { type: GraphQLList(UserType) },
         prospects: { type: GraphQLList(UserType) },
@@ -46,6 +47,17 @@ const UserType = new GraphQLObjectType({
         isMatchable: { type: GraphQLBoolean }
     })
 })
+
+//Personality Type
+
+const PTypeType = new GraphQLObjectType({
+    name: 'PType',
+    fields: () => ({
+        id: { type: GraphQLInt },
+        name: { type: GraphQLString },
+        description: { type: GraphQLString }
+    })
+});
 
 // Root Query
 
@@ -59,6 +71,36 @@ const RootQuery = new GraphQLObjectType({
                     attributes: ['id', 'typeAttributeId', 'content', 'scoringScalar']
                 });
                 return questions;
+            }
+        },
+        user: {
+            type: UserType,
+            args: {
+                email: { type: GraphQLString }
+            },
+            async resolve(parent, args) {
+                const user = await User.findOne({
+                    where: {
+                        email: args.email
+                    },
+                    include: [
+                        {
+                            model: PType,
+                            attributes: ['name', 'description']
+                        }
+                    ]
+                });
+                return user;
+            }
+        },
+        pType: {
+            type: PTypeType,
+            args: {
+                id: { type: GraphQLInt }
+            },
+            async resolve(parent, args) {
+                const pType = await PType.findByPk(args.id);
+                return pType;
             }
         }
     }
@@ -75,19 +117,22 @@ const RootMutation = new GraphQLObjectType({
                 firstName: { type: new GraphQLNonNull(GraphQLString) },
                 email: { type: new GraphQLNonNull(GraphQLString) },
                 auth0Id: { type: new GraphQLNonNull(GraphQLString) },
-                profilePhoto: { type: new GraphQLNonNull(GraphQLString) },
+                profilePhoto: { type: GraphQLString },
                 // isMatchable: { type: new GraphQLNonNull(GraphQLBoolean) },
             },
             async resolve(parentValue, args) {
-                const user = await User.findOrCreate({
+                let user = await User.findOrCreate({
                     where: {
                         firstName: args.firstName,
                         email: args.email,
                         auth0Id: args.auth0Id,
-                        profilePhoto: args.profilePhoto
+                        // profilePhoto: args.profilePhoto
                     }
                 });
-                console.log('user in create mutation: ', user);
+                // if (!user.profilePhoto) {
+                //     updatedUser = await user.update({ profilePhoto: args.profilePhoto })
+                // }
+                // if (updatedUser) return updatedUser[0].dataValues;
                 return user[0].dataValues;
             }
         },
@@ -121,7 +166,6 @@ const RootMutation = new GraphQLObjectType({
                 if (args.rawNS >= 0) pTypeId += 4;
                 if (args.rawEI >= 0) pTypeId += 8;
                 await user.update({ ...args, isMatchable: true, pTypeId });
-                console.log('user in create mutation: ', user);
 
                 return user;
             }

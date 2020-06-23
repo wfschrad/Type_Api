@@ -23,7 +23,6 @@ module.exports = {
         unique: true
       },
       profilePhoto: {
-        allowNull: false,
         type: Sequelize.STRING
       },
       pTypeId: {

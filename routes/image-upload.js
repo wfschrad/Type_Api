@@ -24,8 +24,8 @@ router.post('/image-upload/:id(\\d+)', (req, res) => {
             if (user) await user.update({
                 profilePhoto: req.file.location
             });
-            //what's best way to get user?
 
+            //force refresh (history?)
 
             console.log('req inside: ', req.body)
 
