@@ -43,10 +43,9 @@ const UserType = new GraphQLObjectType({
         bio: { type: GraphQLString },
         pTypeId: { type: GraphQLInt },
         PType: { type: PTypeType },
-        currentMatches: { type: GraphQLList(UserType) },
-        pendingMatches: { type: GraphQLList(UserType) },
-        prospects: { type: GraphQLList(UserType) },
-        denials: { type: GraphQLList(UserType) },
+        currentMatches: { type: GraphQLList(GraphQLInt) },
+        pendingMatches: { type: GraphQLList(GraphQLInt) },
+        denials: { type: GraphQLList(GraphQLInt) },
         rawEI: { type: GraphQLInt },
         rawNS: { type: GraphQLInt },
         rawFT: { type: GraphQLInt },
@@ -103,6 +102,7 @@ const RootQuery = new GraphQLObjectType({
         prospects: {
             type: new GraphQLList(UserType),
             args: {
+                userId: { type: GraphQLInt },
                 userPTypeId: { type: GraphQLInt },
                 relThresh: { type: GraphQLInt }
             },
@@ -126,16 +126,21 @@ const RootQuery = new GraphQLObjectType({
                     where: {
                         pTypeId: { [Op.in]: spreadTargets }
                     },
-
-                    //     include: [
-                    //     {
-                    //         model: PType,
-                    //         attributes: ['name', 'description']
-                    //     }
-                    // ]
+                    include: [
+                        {
+                            model: PType,
+                            attributes: ['name', 'description']
+                        }
+                    ]
                 });
 
-                return prospectPool;
+                //refactor this to fetch targets via include
+                //at minimun limit returned attributes
+                const tempUser = await User.findByPk(args.userId);
+                let prospects = prospectPool.filter(prospect => !tempUser.denials.includes(prospect));
+                prospects = prospects.filter(prospect => !tempUser.currentMatches.includes(prospect));
+
+                return prospects;
 
                 //filter prospectPool for current matches or denials
 

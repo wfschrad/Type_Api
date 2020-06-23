@@ -1,7 +1,17 @@
 'use strict';
 
+// const { sequelize } = require("../models");
+// const { DataTypes } = require("sequelize/types");
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
+    const seedDenials = [];
+    seedDenials.push(4);
+    seedDenials.push(6);
+
+    const seedMatches = [];
+    seedMatches.push(3);
+
     return queryInterface.bulkInsert('Users', [
       {
         firstName: 'b',
@@ -13,6 +23,8 @@ module.exports = {
         rawNS: 4,
         rawFT: 4,
         rawJP: 4,
+        denials: seedDenials,
+        currentMatches: seedMatches,
         isMatchable: true,
         createdAt: new Date(),
         updatedAt: new Date()
