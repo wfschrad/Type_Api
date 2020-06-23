@@ -22,7 +22,7 @@ router.post('/image-upload/:id(\\d+)', (req, res) => {
             });
 
             if (user) await user.update({
-                profilePhoto: req.file.location
+                uploadedPhoto: req.file.location
             });
 
             //force refresh (history?)

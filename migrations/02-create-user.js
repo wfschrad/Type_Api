@@ -25,6 +25,21 @@ module.exports = {
       profilePhoto: {
         type: Sequelize.STRING
       },
+      uploadedPhoto: {
+        type: Sequelize.STRING
+      },
+      preferredName: {
+        type:Sequelize.STRING
+      },
+      age: {
+        type: Sequelize.INTEGER
+      },
+      gender: {
+        type:Sequelize.STRING
+      },
+      bio: {
+        type:Sequelize.STRING
+      },
       pTypeId: {
         type: Sequelize.INTEGER
       },

@@ -34,6 +34,11 @@ const UserType = new GraphQLObjectType({
         email: { type: GraphQLString },
         auth0Id: { type: GraphQLString },
         profilePhoto: { type: GraphQLString },
+        uploadedPhoto: { type: GraphQLString },
+        preferredName: { type: GraphQLString },
+        age: { type: GraphQLInt },
+        gender: { type: GraphQLString },
+        bio: { type: GraphQLString },
         pTypeId: { type: GraphQLInt },
         PType: { type: PTypeType },
         currentMatches: { type: GraphQLList(UserType) },
@@ -126,23 +131,25 @@ const RootMutation = new GraphQLObjectType({
                         firstName: args.firstName,
                         email: args.email,
                         auth0Id: args.auth0Id,
-                        // profilePhoto: args.profilePhoto
+                        profilePhoto: args.profilePhoto
                     }
                 });
+                // let newUser;
                 // if (!user.profilePhoto) {
-                //     updatedUser = await user.update({ profilePhoto: args.profilePhoto })
+                //     newUser = await user.update({ profilePhoto: args.profilePhoto })
                 // }
-                // if (updatedUser) return updatedUser[0].dataValues;
+                // if (newUser) return newUser[0].dataValues;
                 return user[0].dataValues;
             }
         },
         onBoardUser: {
             type: UserType,
             args: {
-                firstName: { type: new GraphQLNonNull(GraphQLString) },
                 email: { type: new GraphQLNonNull(GraphQLString) },
-                gender: { type: new GraphQLNonNull(GraphQLString) },
+                uploadedPhoto: { type: new GraphQLNonNull(GraphQLString) },
+                preferredName: { type: new GraphQLNonNull(GraphQLString) },
                 age: { type: new GraphQLNonNull(GraphQLInt) },
+                gender: { type: new GraphQLNonNull(GraphQLString) },
                 bio: { type: new GraphQLNonNull(GraphQLString) },
                 rawEI: { type: new GraphQLNonNull(GraphQLInt) },
                 rawNS: { type: new GraphQLNonNull(GraphQLInt) },
