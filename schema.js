@@ -157,7 +157,6 @@ const RootQuery = new GraphQLObjectType({
                 //     }
                 // ]
                 // });
-                return prospects;
             }
         },
         pType: {
