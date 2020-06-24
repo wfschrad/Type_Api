@@ -1,30 +1,11 @@
-const express = require('express');
-const morgan = require("morgan");
-const graphqlHTTP = require('express-graphql');
-const cors = require('cors');
-
-const { requiresAuth } = require('./utils/auth');
-const schema = require('./schema');
-const imageRouter = require('./routes/image-upload');
-
-const app = express();
-
-// SOCKET LOGIC
-
-
-
-const http = require('http').createServer(app);
-
-//refactor to import app into socket manager???
-const io = require('socket.io')(http);
-console.log('io HERE', io)
-// const SocketManager = require('./socket-manager');
+const { app } = require('./server');
+console.log('app in manager: ', app)
 const { VERIFY_USER, USER_CONNECTED, LOGOUT } = require('./socket-events');
 const { createUser, createMessage, createChat } = require('./Factories');
 
 let connectedUsers = {};
 
-const SocketManager = (socket) => {
+module.exports = (socket) => {
     console.log(`Socket Id: ${socket.id}`);
 
     //verify username
@@ -76,41 +57,3 @@ const SocketManager = (socket) => {
 
     //user logouts
 }
-
-io.on('connection', SocketManager);
-
-
-
-// END SOCKET
-
-// use http with socket.io for private messaging
-
-
-
-app.use(cors({ origin: true })); // make more restrictive for production
-
-app.use('/graphql', graphqlHTTP({
-    schema,
-    graphiql: true
-}));
-
-app.use('/aws', imageRouter);
-
-// const port = process.env.PORT || 8080;
-
-
-
-// app.use(jwtCheck);
-
-// Define an endpoint that must be called with an access token
-app.get("/api/external", requiresAuth, (req, res) => {
-    res.send({
-        msg: "It actually works!"
-    });
-});
-
-module.exports = {
-    app,
-    http,
-    io
-};

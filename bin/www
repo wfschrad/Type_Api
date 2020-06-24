@@ -1,5 +1,6 @@
-const { port } = require("../config");
+const { port, socketPort } = require("../config");
 
-const app = require("../server");
+const { app, http } = require("../server");
 app
 app.listen(port, () => console.log(`Listening on port ${port}...`));
+http.listen(socketPort, () => console.log(`Socket server listening on port ${socketPort}`));
