@@ -19,10 +19,11 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 console.log('io HERE', io)
 // const SocketManager = require('./socket-manager');
-const { VERIFY_USER, USER_CONNECTED, LOGOUT } = require('./socket-events');
+const { VERIFY_USER, USER_CONNECTED, LOGOUT, USER_DISCONNECTED, COMMUNITY_CHAT } = require('./socket-events');
 const { createUser, createMessage, createChat } = require('./Factories');
 
 let connectedUsers = {};
+let communityChat = createChat();
 
 const SocketManager = (socket) => {
     console.log(`Socket Id: ${socket.id}`);
@@ -74,7 +75,26 @@ const SocketManager = (socket) => {
 
     //user disconnects
 
+    socket.on('disconnect', () => {
+        if ('user' in socket) {
+            connectedUsers = removeUser(connectedUsers, socket.user.name);
+            io.emit(USER_DISCONNECTED, connectedUsers);
+            console.log('disconnect: ', connectedUsers);
+        }
+    })
+
     //user logouts
+
+    socket.on(LOGOUT, () => {
+        connectedUsers = removeUser(connectedUsers, socket.user.name);
+        io.emit(USER_DISCONNECTED, connectedUsers);
+    });
+
+    //get community chat
+
+    socket.on(COMMUNITY_CHAT, (cb) => {
+        cb(communityChat);
+    })
 }
 
 io.on('connection', SocketManager);
