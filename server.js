@@ -19,7 +19,8 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 console.log('io HERE', io)
 // const SocketManager = require('./socket-manager');
-const { VERIFY_USER, USER_CONNECTED, LOGOUT, USER_DISCONNECTED, COMMUNITY_CHAT } = require('./socket-events');
+const { VERIFY_USER, USER_CONNECTED, LOGOUT, USER_DISCONNECTED,
+    COMMUNITY_CHAT, MESSAGE_RECEIVED, MESSAGE_SENT, TYPING } = require('./socket-events');
 const { createUser, createMessage, createChat } = require('./Factories');
 
 let connectedUsers = {};
@@ -28,6 +29,8 @@ let communityChat = createChat();
 const SocketManager = (socket) => {
     console.log(`Socket Id: ${socket.id}`);
 
+    let sendMessageToChatFromUser;
+    let sendTypingFromUser;
     //verify username
 
     socket.on(VERIFY_USER, (nickname, cb) => {
@@ -62,12 +65,22 @@ const SocketManager = (socket) => {
         return newList;
     }
 
+    function sendMessageToChat (sender) {
+        return (chatId, message) => {
+            io.emit(`${MESSAGE_RECEIVED}-${chatId}`, createMessage({message, sender}));
+        }
+    }
+
     // user connects with username
 
     socket.on(USER_CONNECTED, (user) => {
         console.log('user 47', user)
         connectedUsers = addUser(connectedUsers, user);
         socket.user = user;
+
+        sendMessageToChatFromUser = sendMessageToChat(user.name);
+        sendTypingFromUser = sendTypingToChat(user.name);
+
         io.emit(USER_CONNECTED, connectedUsers);
         console.log('connected users: ', connectedUsers);
         console.log('socket: ', socket);
@@ -95,6 +108,21 @@ const SocketManager = (socket) => {
     socket.on(COMMUNITY_CHAT, (cb) => {
         cb(communityChat);
     })
+
+    socket.on(MESSAGE_SENT, ({chatId, message}) => {
+        sendMessageToChatFromUser(chatId, message);
+    })
+
+    socket.on(TYPING, (chatId, isTyping) => {
+        console.log(isTyping);
+        sendTypingFromUser(chatId, isTyping);
+    })
+
+    function sendTypingToChat(user) {
+        return (chatId, isTyping) => {
+            io.emit(`${TYPING}-${chatId}`, {user, isTyping});
+        }
+    }
 }
 
 io.on('connection', SocketManager);
