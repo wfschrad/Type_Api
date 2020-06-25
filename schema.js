@@ -102,9 +102,9 @@ const RootQuery = new GraphQLObjectType({
                             model: PType,
                             attributes: ['name', 'description']
                         },
-                        // {
-                        //     model: Match, as: 'matches'
-                        // }
+                        {
+                            model: Match, as: 'matches'
+                        }
                     ]
                 });
                 return user;
@@ -189,23 +189,30 @@ const RootMutation = new GraphQLObjectType({
             }
         },
         addMatch: {
-            type: MatchType,
+            type: UserType,
             args: {
                 user1: { type: new GraphQLNonNull(GraphQLInt) },
                 user2: { type: new GraphQLNonNull(GraphQLInt) },
             },
             async resolve(parentValue, args) {
-                const match = await Match.create({...args});
-                // const user = await User.findByPk(args.user1);
-                // const user2= await User.findByPk(args.user2);
-                // user.setMatches([user2])
+                // const match = await Match.create({...args}
+                const user1 = await User.findByPk(args.user1, {
+                    include: 'matches'
+                });
+                const user2= await User.findByPk(args.user2, {
+                    include: 'matches'
+                });
+                user1.addMatches([user2]);
+                user2.addMatches([user1]);
+                // await user1.save();
+                // await user2.save();
 
                 //     , {
                 //     include: [{
                 //         model: User
                 //     }]
                 // });
-                return match;
+                return user2;
             }
         },
     }

@@ -24,12 +24,14 @@ module.exports = (sequelize, DataTypes) => {
     User.belongsToMany(models.User, {
       through: 'Matches',
       as: 'matches',
-      foreignKey: 'userId1'
+      otherKey: 'user2',
+      foreignKey: 'user1'
     });
     User.belongsToMany(models.User, {
       through: 'Matches',
       as: 'matchedWith',
-      foreignKey: 'userId2'
+      otherKey: 'user1',
+      foreignKey: 'user2'
     });
     User.belongsToMany(models.User, {
       through: 'Denials',
