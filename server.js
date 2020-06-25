@@ -26,6 +26,8 @@ const { createUser, createMessage, createChat } = require('./Factories');
 let connectedUsers = {};
 let communityChat = createChat();
 
+const testManager = require('./socket-manager');
+
 const SocketManager = (socket) => {
     console.log(`Socket Id: ${socket.id}`);
 

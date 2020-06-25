@@ -1,4 +1,4 @@
-const { TypingQuestion, User, PType } = require('./models');
+const { TypingQuestion, User, PType, Match, Denial, PendingMatch } = require('./models');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -41,9 +41,8 @@ const UserType = new GraphQLObjectType({
         bio: { type: GraphQLString },
         pTypeId: { type: GraphQLInt },
         PType: { type: PTypeType },
-        currentMatches: { type: GraphQLList(UserType) },
+        matches: { type: GraphQLList(UserType) },
         pendingMatches: { type: GraphQLList(UserType) },
-        prospects: { type: GraphQLList(UserType) },
         denials: { type: GraphQLList(UserType) },
         rawEI: { type: GraphQLInt },
         rawNS: { type: GraphQLInt },
@@ -53,6 +52,16 @@ const UserType = new GraphQLObjectType({
     })
 })
 
+// Match Type
+
+const MatchType = new GraphQLObjectType({
+    name: 'Match',
+    fields: () => ({
+        id: { type: GraphQLInt },
+        user1: { type: UserType },
+        user2: { type: UserType }
+    })
+})
 //Personality Type
 
 const PTypeType = new GraphQLObjectType({
@@ -175,6 +184,23 @@ const RootMutation = new GraphQLObjectType({
                 await user.update({ ...args, isMatchable: true, pTypeId });
 
                 return user;
+            }
+        },
+        addMatch: {
+            type: MatchType,
+            args: {
+                user1: { type: new GraphQLNonNull(GraphQLInt) },
+                user2: { type: new GraphQLNonNull(GraphQLInt) },
+            },
+            async resolve(parentValue, args) {
+                const match = await Match.create({...args});
+
+                //     , {
+                //     include: [{
+                //         model: User
+                //     }]
+                // });
+                return match;
             }
         },
     }
