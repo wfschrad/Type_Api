@@ -102,9 +102,9 @@ const RootQuery = new GraphQLObjectType({
                             model: PType,
                             attributes: ['name', 'description']
                         },
-                        {
-                            model: Match, as: 'matches'
-                        }
+                        'matches',
+                        'denials',
+                        'pendingMatches'
                     ]
                 });
                 return user;
@@ -119,7 +119,16 @@ const RootQuery = new GraphQLObjectType({
                 const pType = await PType.findByPk(args.id);
                 return pType;
             }
-        }
+        },
+        // matches: {
+        //     type: GraphQLList(UserType),
+        //     args: {
+        //         userId: { type: GraphQLInt }
+        //     },
+        //     async resolve(parent, args) {
+        //         const matches = User.findAll
+        //     }
+        // }
     }
 });
 
@@ -204,6 +213,60 @@ const RootMutation = new GraphQLObjectType({
                 });
                 user1.addMatches([user2]);
                 user2.addMatches([user1]);
+                // await user1.save();
+                // await user2.save();
+
+                //     , {
+                //     include: [{
+                //         model: User
+                //     }]
+                // });
+                return user2;
+            }
+        },
+        addDenial: {
+            type: UserType,
+            args: {
+                user1: { type: new GraphQLNonNull(GraphQLInt) },
+                user2: { type: new GraphQLNonNull(GraphQLInt) },
+            },
+            async resolve(parentValue, args) {
+                // const match = await Match.create({...args}
+                const user1 = await User.findByPk(args.user1, {
+                    include: 'denials'
+                });
+                const user2= await User.findByPk(args.user2, {
+                    include: 'denials'
+                });
+                user1.addDenials([user2]);
+                user2.addDenials([user1]);
+                // await user1.save();
+                // await user2.save();
+
+                //     , {
+                //     include: [{
+                //         model: User
+                //     }]
+                // });
+                return user2;
+            }
+        },
+        addPendingMatch: {
+            type: UserType,
+            args: {
+                user1: { type: new GraphQLNonNull(GraphQLInt) },
+                user2: { type: new GraphQLNonNull(GraphQLInt) },
+            },
+            async resolve(parentValue, args) {
+                // const match = await Match.create({...args}
+                const user1 = await User.findByPk(args.user1, {
+                    include: 'pendingMatches'
+                });
+                const user2= await User.findByPk(args.user2, {
+                    include: 'pendingMatches'
+                });
+                user1.addPendingMatches([user2]);
+                user2.addPendingMatches([user1]);
                 // await user1.save();
                 // await user2.save();
 

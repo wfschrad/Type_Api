@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Matches', {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('Matches', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -9,20 +9,10 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       user1: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Users',
-          key: 'id'
-        }
+        type: Sequelize.INTEGER
       },
       user2: {
-        allowNull: false,
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Users',
-          key: 'id'
-        }
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
@@ -32,18 +22,9 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
-    },
-    {
-      uniqueKeys: {
-        unique_tag: {
-          customIndex: true,
-          fields: ['user1', 'user2']
-        }
-      }
-    }
-    );
+    });
   },
-  down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Matches');
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('Matches');
   }
 };
