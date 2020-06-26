@@ -24,7 +24,9 @@ const { VERIFY_USER, USER_CONNECTED, LOGOUT, USER_DISCONNECTED,
 const { createUser, createMessage, createChat } = require('./Factories');
 
 let connectedUsers = {};
-let communityChat = createChat();
+let communityChat = createChat({
+    isCommunity: true
+});
 
 const testManager = require('./socket-manager');
 
@@ -82,6 +84,7 @@ const SocketManager = (socket) => {
         socket.user = user;
 
         sendMessageToChatFromUser = sendMessageToChat(user.name);
+        debugger
         sendTypingFromUser = sendTypingToChat(user.name);
 
         io.emit(USER_CONNECTED, connectedUsers);
@@ -116,17 +119,22 @@ const SocketManager = (socket) => {
         sendMessageToChatFromUser(chatId, message);
     })
 
-    socket.on(TYPING, (chatId, isTyping) => {
+    socket.on(TYPING, ({chatId, isTyping}) => {
         console.log(isTyping);
+        debugger
         sendTypingFromUser(chatId, isTyping);
-    })
+    });
 
-    socket.on(PRIVATE_MESSAGE, ({receiver, sender}) => {
+    socket.on(PRIVATE_MESSAGE, ({receiver, sender, activeChat}) => {
         if (receiver in connectedUsers) {
+           if (!activeChat || activeChat.id === communityChat.id) {
             const newChat = createChat({ name: `${receiver}&${sender}`, users:[receiver, sender] });
             const receiverSocket = connectedUsers[receiver].socketId;
             socket.to(receiverSocket).emit(PRIVATE_MESSAGE, newChat);
             socket.emit(PRIVATE_MESSAGE, newChat);
+           } else {
+               socket.to(receiverSocket).emit(PRIVATE_MESSAGE, activeChat);
+           }
         }
     })
 
