@@ -20,7 +20,7 @@ const io = require('socket.io')(http);
 console.log('io HERE', io)
 // const SocketManager = require('./socket-manager');
 const { VERIFY_USER, USER_CONNECTED, LOGOUT, USER_DISCONNECTED,
-    COMMUNITY_CHAT, MESSAGE_RECEIVED, MESSAGE_SENT, TYPING } = require('./socket-events');
+    COMMUNITY_CHAT, MESSAGE_RECEIVED, MESSAGE_SENT, TYPING, PRIVATE_MESSAGE } = require('./socket-events');
 const { createUser, createMessage, createChat } = require('./Factories');
 
 let connectedUsers = {};
@@ -45,7 +45,7 @@ const SocketManager = (socket) => {
             cb({
                 isUser: false,
                 user: createUser(({
-                    name: nickname
+                    name: nickname, socketId: socket.id
                 }))
             });
         }
@@ -76,6 +76,7 @@ const SocketManager = (socket) => {
     // user connects with username
 
     socket.on(USER_CONNECTED, (user) => {
+        user.socketId = socket.id;
         console.log('user 47', user)
         connectedUsers = addUser(connectedUsers, user);
         socket.user = user;
@@ -118,6 +119,15 @@ const SocketManager = (socket) => {
     socket.on(TYPING, (chatId, isTyping) => {
         console.log(isTyping);
         sendTypingFromUser(chatId, isTyping);
+    })
+
+    socket.on(PRIVATE_MESSAGE, ({receiver, sender}) => {
+        if (receiver in connectedUsers) {
+            const newChat = createChat({ name: `${receiver}&${sender}`, users:[receiver, sender] });
+            const receiverSocket = connectedUsers[receiver].socketId;
+            socket.to(receiverSocket).emit(PRIVATE_MESSAGE, newChat);
+            socket.emit(PRIVATE_MESSAGE, newChat);
+        }
     })
 
     function sendTypingToChat(user) {

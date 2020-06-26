@@ -56,6 +56,9 @@ module.exports = (socket) => {
         console.log('socket: ', socket);
     })
 
+
+    // OTHER FUNCTIONS IN SERVER.JS
+
     //user disconnects
 
     //user logouts
