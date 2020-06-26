@@ -1,4 +1,4 @@
-const { TypingQuestion, User, PType } = require('./models');
+const { TypingQuestion, User, PType, Match, Denial, PendingMatch } = require('./models');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
@@ -43,9 +43,15 @@ const UserType = new GraphQLObjectType({
         bio: { type: GraphQLString },
         pTypeId: { type: GraphQLInt },
         PType: { type: PTypeType },
+<<<<<<< HEAD
         currentMatches: { type: GraphQLList(GraphQLInt) },
         pendingMatches: { type: GraphQLList(GraphQLInt) },
         denials: { type: GraphQLList(GraphQLInt) },
+=======
+        matches: { type: GraphQLList(UserType) },
+        pendingMatches: { type: GraphQLList(UserType) },
+        denials: { type: GraphQLList(UserType) },
+>>>>>>> 318e8375bad776b182e9c2b1c7016a164f410838
         rawEI: { type: GraphQLInt },
         rawNS: { type: GraphQLInt },
         rawFT: { type: GraphQLInt },
@@ -54,6 +60,16 @@ const UserType = new GraphQLObjectType({
     })
 })
 
+// Match Type
+
+const MatchType = new GraphQLObjectType({
+    name: 'Match',
+    fields: () => ({
+        id: { type: GraphQLInt },
+        user1: { type: UserType },
+        user2: { type: UserType }
+    })
+})
 //Personality Type
 
 const PTypeType = new GraphQLObjectType({
@@ -82,18 +98,18 @@ const RootQuery = new GraphQLObjectType({
         user: {
             type: UserType,
             args: {
-                email: { type: GraphQLString }
+               userId: { type: GraphQLInt }
             },
             async resolve(parent, args) {
-                const user = await User.findOne({
-                    where: {
-                        email: args.email
-                    },
+                const user = await User.findByPk(args.userId, {
                     include: [
                         {
                             model: PType,
                             attributes: ['name', 'description']
-                        }
+                        },
+                        'matches',
+                        'denials',
+                        'pendingMatches'
                     ]
                 });
                 return user;
@@ -168,7 +184,16 @@ const RootQuery = new GraphQLObjectType({
                 const pType = await PType.findByPk(args.id);
                 return pType;
             }
-        }
+        },
+        // matches: {
+        //     type: GraphQLList(UserType),
+        //     args: {
+        //         userId: { type: GraphQLInt }
+        //     },
+        //     async resolve(parent, args) {
+        //         const matches = User.findAll
+        //     }
+        // }
     }
 });
 
@@ -207,7 +232,6 @@ const RootMutation = new GraphQLObjectType({
             type: UserType,
             args: {
                 email: { type: new GraphQLNonNull(GraphQLString) },
-                uploadedPhoto: { type: new GraphQLNonNull(GraphQLString) },
                 preferredName: { type: new GraphQLNonNull(GraphQLString) },
                 age: { type: new GraphQLNonNull(GraphQLInt) },
                 gender: { type: new GraphQLNonNull(GraphQLString) },
@@ -236,6 +260,87 @@ const RootMutation = new GraphQLObjectType({
                 await user.update({ ...args, isMatchable: true, pTypeId });
 
                 return user;
+            }
+        },
+        addMatch: {
+            type: UserType,
+            args: {
+                user1: { type: new GraphQLNonNull(GraphQLInt) },
+                user2: { type: new GraphQLNonNull(GraphQLInt) },
+            },
+            async resolve(parentValue, args) {
+                // const match = await Match.create({...args}
+                const user1 = await User.findByPk(args.user1, {
+                    include: 'matches'
+                });
+                const user2= await User.findByPk(args.user2, {
+                    include: 'matches'
+                });
+                user1.addMatches([user2]);
+                user2.addMatches([user1]);
+                // await user1.save();
+                // await user2.save();
+
+                //     , {
+                //     include: [{
+                //         model: User
+                //     }]
+                // });
+                return user2;
+            }
+        },
+        addDenial: {
+            type: UserType,
+            args: {
+                user1: { type: new GraphQLNonNull(GraphQLInt) },
+                user2: { type: new GraphQLNonNull(GraphQLInt) },
+            },
+            async resolve(parentValue, args) {
+                // const match = await Match.create({...args}
+                const user1 = await User.findByPk(args.user1, {
+                    include: 'denials'
+                });
+                const user2= await User.findByPk(args.user2, {
+                    include: 'denials'
+                });
+                user1.addDenials([user2]);
+                user2.addDenials([user1]);
+                // await user1.save();
+                // await user2.save();
+
+                //     , {
+                //     include: [{
+                //         model: User
+                //     }]
+                // });
+                return user2;
+            }
+        },
+        addPendingMatch: {
+            type: UserType,
+            args: {
+                user1: { type: new GraphQLNonNull(GraphQLInt) },
+                user2: { type: new GraphQLNonNull(GraphQLInt) },
+            },
+            async resolve(parentValue, args) {
+                // const match = await Match.create({...args}
+                const user1 = await User.findByPk(args.user1, {
+                    include: 'pendingMatches'
+                });
+                const user2= await User.findByPk(args.user2, {
+                    include: 'pendingMatches'
+                });
+                user1.addPendingMatches([user2]);
+                user2.addPendingMatches([user1]);
+                // await user1.save();
+                // await user2.save();
+
+                //     , {
+                //     include: [{
+                //         model: User
+                //     }]
+                // });
+                return user2;
             }
         },
     }
