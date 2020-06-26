@@ -20,7 +20,7 @@ const io = require('socket.io')(http);
 console.log('io HERE', io)
 // const SocketManager = require('./socket-manager');
 const { VERIFY_USER, USER_CONNECTED, LOGOUT, USER_DISCONNECTED,
-    COMMUNITY_CHAT, MESSAGE_RECEIVED, MESSAGE_SENT, TYPING, PRIVATE_MESSAGE } = require('./socket-events');
+    COMMUNITY_CHAT, MESSAGE_RECEIVED, MESSAGE_SENT, TYPING, PRIVATE_MESSAGE, NEW_CHAT_USER } = require('./socket-events');
 const { createUser, createMessage, createChat } = require('./Factories');
 
 let connectedUsers = {};
@@ -127,12 +127,21 @@ const SocketManager = (socket) => {
 
     socket.on(PRIVATE_MESSAGE, ({receiver, sender, activeChat}) => {
         if (receiver in connectedUsers) {
+            let receiverSocket;
            if (!activeChat || activeChat.id === communityChat.id) {
             const newChat = createChat({ name: `${receiver}&${sender}`, users:[receiver, sender] });
-            const receiverSocket = connectedUsers[receiver].socketId;
+            receiverSocket = connectedUsers[receiver].socketId;
             socket.to(receiverSocket).emit(PRIVATE_MESSAGE, newChat);
             socket.emit(PRIVATE_MESSAGE, newChat);
            } else {
+               if (!(receiver in activeChat.users)) {
+                   activeChat.users.filter(user => user in connectedUsers)
+                   .map(user => connectedUsers[user])
+                   .map(user => {
+                       socket.to(user.socketId).emit(NEW_CHAT_USER, {chatId: activeChat.id, newUser: receiver});
+                   })
+                   socket.emit(NEW_CHAT_USER, { chatId: activeChat.id, newUser: receiver});
+               }
                socket.to(receiverSocket).emit(PRIVATE_MESSAGE, activeChat);
            }
         }
