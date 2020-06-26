@@ -43,15 +43,9 @@ const UserType = new GraphQLObjectType({
         bio: { type: GraphQLString },
         pTypeId: { type: GraphQLInt },
         PType: { type: PTypeType },
-<<<<<<< HEAD
-        currentMatches: { type: GraphQLList(GraphQLInt) },
-        pendingMatches: { type: GraphQLList(GraphQLInt) },
-        denials: { type: GraphQLList(GraphQLInt) },
-=======
         matches: { type: GraphQLList(UserType) },
         pendingMatches: { type: GraphQLList(UserType) },
         denials: { type: GraphQLList(UserType) },
->>>>>>> 318e8375bad776b182e9c2b1c7016a164f410838
         rawEI: { type: GraphQLInt },
         rawNS: { type: GraphQLInt },
         rawFT: { type: GraphQLInt },
@@ -98,7 +92,7 @@ const RootQuery = new GraphQLObjectType({
         user: {
             type: UserType,
             args: {
-               userId: { type: GraphQLInt }
+                userId: { type: GraphQLInt }
             },
             async resolve(parent, args) {
                 const user = await User.findByPk(args.userId, {
@@ -273,7 +267,7 @@ const RootMutation = new GraphQLObjectType({
                 const user1 = await User.findByPk(args.user1, {
                     include: 'matches'
                 });
-                const user2= await User.findByPk(args.user2, {
+                const user2 = await User.findByPk(args.user2, {
                     include: 'matches'
                 });
                 user1.addMatches([user2]);
@@ -300,7 +294,7 @@ const RootMutation = new GraphQLObjectType({
                 const user1 = await User.findByPk(args.user1, {
                     include: 'denials'
                 });
-                const user2= await User.findByPk(args.user2, {
+                const user2 = await User.findByPk(args.user2, {
                     include: 'denials'
                 });
                 user1.addDenials([user2]);
@@ -327,7 +321,7 @@ const RootMutation = new GraphQLObjectType({
                 const user1 = await User.findByPk(args.user1, {
                     include: 'pendingMatches'
                 });
-                const user2= await User.findByPk(args.user2, {
+                const user2 = await User.findByPk(args.user2, {
                     include: 'pendingMatches'
                 });
                 user1.addPendingMatches([user2]);
