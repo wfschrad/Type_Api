@@ -90,13 +90,10 @@ const RootQuery = new GraphQLObjectType({
         user: {
             type: UserType,
             args: {
-                email: { type: GraphQLString }
+               userId: { type: GraphQLInt }
             },
             async resolve(parent, args) {
-                const user = await User.findOne({
-                    where: {
-                        email: args.email
-                    },
+                const user = await User.findByPk(args.userId, {
                     include: [
                         {
                             model: PType,

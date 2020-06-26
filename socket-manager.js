@@ -1,30 +1,12 @@
 const { app } = require('./server');
 console.log('app in manager: ', app)
-const { VERIFY_USER, USER_CONNECTED, LOGOUT } = require('./socket-events');
+const { VERIFY_USER, USER_CONNECTED, LOGOUT, PRIVATE_MESSAGE } = require('./socket-events');
 const { createUser, createMessage, createChat } = require('./Factories');
 
 let connectedUsers = {};
 
 module.exports = (socket) => {
     console.log(`Socket Id: ${socket.id}`);
-
-    //verify username
-
-    socket.on(VERIFY_USER, (nickname, cb) => {
-        if (isUser(connectedUsers, nickname)) {
-            cb({
-                isUser: true,
-                user: null
-            });
-        } else {
-            cb({
-                isUser: false,
-                user: createUser(({
-                    name: nickname
-                }))
-            });
-        }
-    });
 
     const isUser = (userList, username) => {
         return username in userList;
@@ -42,9 +24,30 @@ module.exports = (socket) => {
         return newList;
     }
 
+    //verify username
+
+    socket.on(VERIFY_USER, (nickname, cb) => {
+        if (isUser(connectedUsers, nickname)) {
+            cb({
+                isUser: true,
+                user: null
+            });
+        } else {
+            cb({
+                isUser: false,
+                user: createUser(({
+                    name: nickname, socketId: socket.id
+                }))
+            });
+        }
+    });
+
+
+
     // user connects with username
 
     socket.on(USER_CONNECTED, (user) => {
+        user.socketId = socket.id;
         console.log('user 47', user)
         connectedUsers = addUser(connectedUsers, user);
         socket.user = user;
