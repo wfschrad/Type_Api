@@ -117,8 +117,8 @@ const RootQuery = new GraphQLObjectType({
                 relThresh: { type: GraphQLInt }
             },
             async resolve(parent, args) {
-                //build acceptable pTypeId array 
-
+                //build acceptable pTypeId array
+                console.log('args', args)
                 const mapSlice = relMap[args.userPTypeId];
                 console.log('mapSlice: ', mapSlice)
                 const targetedSlice = mapSlice.slice(args.relThresh);
@@ -150,7 +150,9 @@ const RootQuery = new GraphQLObjectType({
                     include: ['denials', 'matches']
                 });
                 console.log('tempUser', tempUser);
+                console.log('propspect pool', prospectPool);
                 let prospects = prospectPool.filter(prospect => !(tempUser.denials.includes(prospect)));
+                console.log('prospects after denials filter: ', prospects);
                 prospects = prospects.filter(prospect => !(tempUser.matches.includes(prospect)));
 
                 return prospects;
