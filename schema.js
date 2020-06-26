@@ -146,9 +146,12 @@ const RootQuery = new GraphQLObjectType({
 
                 //refactor this to fetch targets via include
                 //at minimun limit returned attributes
-                const tempUser = await User.findByPk(args.userId);
-                let prospects = prospectPool.filter(prospect => !tempUser.denials.includes(prospect));
-                prospects = prospects.filter(prospect => !tempUser.currentMatches.includes(prospect));
+                const tempUser = await User.findByPk(args.userId, {
+                    include: ['denials', 'matches']
+                });
+                console.log('tempUser', tempUser);
+                let prospects = prospectPool.filter(prospect => !(tempUser.denials.includes(prospect)));
+                prospects = prospects.filter(prospect => !(tempUser.matches.includes(prospect)));
 
                 return prospects;
 
@@ -225,7 +228,7 @@ const RootMutation = new GraphQLObjectType({
         onBoardUser: {
             type: UserType,
             args: {
-                email: { type: new GraphQLNonNull(GraphQLString) },
+                userId: { type: new GraphQLNonNull(GraphQLInt) },
                 preferredName: { type: new GraphQLNonNull(GraphQLString) },
                 age: { type: new GraphQLNonNull(GraphQLInt) },
                 gender: { type: new GraphQLNonNull(GraphQLString) },
@@ -238,10 +241,8 @@ const RootMutation = new GraphQLObjectType({
                 // isMatchable: { type: new GraphQLNonNull(GraphQLBoolean) },
             },
             async resolve(parentValue, args) {
-                const user = await User.findOne({
-                    where: {
-                        email: args.email,
-                    }
+                const user = await User.findByPk(args.userId, {
+                    include: 'matches'
                 });
 
                 // Calculate pTypeId
