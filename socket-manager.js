@@ -1,4 +1,4 @@
-const { app } = require('./server');
+const app  = require('./server');
 console.log('app in manager: ', app)
 const { VERIFY_USER, USER_CONNECTED, LOGOUT, PRIVATE_MESSAGE } = require('./socket-events');
 const { createUser, createMessage, createChat } = require('./Factories');

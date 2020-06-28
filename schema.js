@@ -268,13 +268,30 @@ const RootMutation = new GraphQLObjectType({
             async resolve(parentValue, args) {
                 // const match = await Match.create({...args}
                 const user1 = await User.findByPk(args.user1, {
-                    include: 'matches'
+                    include: ['matches', 'pendingMatches']
                 });
                 const user2 = await User.findByPk(args.user2, {
-                    include: 'matches'
+                    include: ['matches', 'pendingMatches']
                 });
-                user1.addMatches([user2]);
-                user2.addMatches([user1]);
+
+                // check for pending match
+                let pendingExist = false;
+                const pendingArr = user2.pendingMatches;
+                console.log('pending arr', pendingArr);
+                for (let i=0; i < pendingArr.length; i ++) {
+                    if (pendingArr[i].id == args.user1) {
+                        pendingExist = true;
+                        break;
+                    }
+                };
+
+
+                if (pendingExist) {
+                    user1.addMatches([user2]);
+                    user2.addMatches([user1]);
+                } else {
+                    user1.addPendingMatches([user2])
+                }
                 // await user1.save();
                 // await user2.save();
 
@@ -297,11 +314,8 @@ const RootMutation = new GraphQLObjectType({
                 const user1 = await User.findByPk(args.user1, {
                     include: 'denials'
                 });
-                const user2 = await User.findByPk(args.user2, {
-                    include: 'denials'
-                });
+                const user2 = await User.findByPk(args.user2);
                 user1.addDenials([user2]);
-                user2.addDenials([user1]);
                 // await user1.save();
                 // await user2.save();
 
@@ -324,11 +338,8 @@ const RootMutation = new GraphQLObjectType({
                 const user1 = await User.findByPk(args.user1, {
                     include: 'pendingMatches'
                 });
-                const user2 = await User.findByPk(args.user2, {
-                    include: 'pendingMatches'
-                });
+                const user2 = await User.findByPk(args.user2);
                 user1.addPendingMatches([user2]);
-                user2.addPendingMatches([user1]);
                 // await user1.save();
                 // await user2.save();
 

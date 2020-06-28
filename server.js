@@ -28,7 +28,7 @@ let communityChat = createChat({
     isCommunity: true
 });
 
-const testManager = require('./socket-manager');
+// const testManager = require('./socket-manager');
 
 const SocketManager = (socket) => {
     console.log(`Socket Id: ${socket.id}`);
@@ -189,5 +189,6 @@ app.get("/api/external", requiresAuth, (req, res) => {
 module.exports = {
     app,
     http,
-    io
+    io,
+    sergey: 'potato'
 };
