@@ -151,8 +151,12 @@ const RootQuery = new GraphQLObjectType({
                 });
                 console.log('tempUser', tempUser);
                 console.log('propspect pool', prospectPool);
+
+                // may need to refactor following filter chain with custom for loops that compare ids to args values
+
                 let prospects = prospectPool.filter(prospect => !(tempUser.denials.includes(prospect)));
                 console.log('prospects after denials filter: ', prospects);
+                // prospects = prospectPool.filter(prospect => !(tempUser.pendingMatches.includes(prospect)));
                 prospects = prospects.filter(prospect => !(tempUser.matches.includes(prospect)));
 
                 return prospects;

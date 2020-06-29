@@ -65,7 +65,7 @@ const SocketManager = (socket) => {
 
     const addUser = (userList, user) => {
         const newList = Object.assign({}, userList);
-        newList[user.name] = user;
+        newList[user.preferredName] = user;
         return newList;
     }
 
@@ -83,9 +83,9 @@ const SocketManager = (socket) => {
         connectedUsers = addUser(connectedUsers, user);
         socket.user = user;
 
-        sendMessageToChatFromUser = sendMessageToChat(user.name);
+        sendMessageToChatFromUser = sendMessageToChat(user.preferredName);
         debugger
-        sendTypingFromUser = sendTypingToChat(user.name);
+        sendTypingFromUser = sendTypingToChat(user.preferredName);
 
         io.emit(USER_CONNECTED, connectedUsers);
         console.log('connected users: ', connectedUsers);
@@ -96,7 +96,7 @@ const SocketManager = (socket) => {
 
     socket.on('disconnect', () => {
         if ('user' in socket) {
-            connectedUsers = removeUser(connectedUsers, socket.user.name);
+            connectedUsers = removeUser(connectedUsers, socket.user.preferredName);
             io.emit(USER_DISCONNECTED, connectedUsers);
             console.log('disconnect: ', connectedUsers);
         }
@@ -105,7 +105,7 @@ const SocketManager = (socket) => {
     //user logouts
 
     socket.on(LOGOUT, () => {
-        connectedUsers = removeUser(connectedUsers, socket.user.name);
+        connectedUsers = removeUser(connectedUsers, socket.user.preferredName);
         io.emit(USER_DISCONNECTED, connectedUsers);
     });
 
@@ -116,13 +116,13 @@ const SocketManager = (socket) => {
     })
 
     socket.on(MESSAGE_SENT, ({chatId, message}) => {
-        sendMessageToChatFromUser(chatId, message);
+        if (sendMessageToChatFromUser) sendMessageToChatFromUser(chatId, message);
     })
 
     socket.on(TYPING, ({chatId, isTyping}) => {
         console.log(isTyping);
         debugger
-        sendTypingFromUser(chatId, isTyping);
+        if (sendTypingFromUser) sendTypingFromUser(chatId, isTyping);
     });
 
     socket.on(PRIVATE_MESSAGE, ({receiver, sender, activeChat}) => {
