@@ -2,6 +2,69 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
+    const enfjDescription = `
+      Great communicator.Imaginative.Organized.Natural leader.
+    `;
+
+    const enfpDescription = `
+      Dynamic.Enthusiastic.Social.Gregarious.
+    `;
+
+    const entjDescription = `
+      Natural leader.Energetic.Driven.Excellent communicator.
+    `;
+
+    const entpDescription = `
+      Inventive.Enthusiastic.Prone to excitement.Risk-taker.
+    `;
+
+    const esfjDescription = `
+    Gracious.Harmonious.Caring.Organized.
+  `;
+
+    const esfpDescription = `
+  Focused on the present.Accepting.Peace-maker.Personable.
+`;
+
+    const estjDescription = `
+Structured.Grounded.Capable.Personable.
+`;
+
+    const estpDescription = `
+Realist.Flexible.Fearless.Gregarious.
+`;
+    const infjDescription = `
+Inspring.Idealist.Creative.Humanitarian.
+`;
+
+    const infpDescription = `
+Idealist.Philanthropic.Reflective.Unpredictable.
+`;
+
+    const intjDescription = `
+Independent.Organized.Thoughtful.Analytical
+`;
+
+    const intpDescription = `
+Philosophical.Intellectual.Eccentric.Broad range of interests.
+`;
+
+    const isfjDescription = `
+Reliable.Strong commitment to serve.Gentle.Caring
+`;
+
+    const isfpDescription = `
+Sensitive.Harmonious.Creative.Unconventional`
+      ;
+
+    const istjDescription = `
+Strong sense of responsibility.Pragmatic.Driven.Loyal.
+`;
+
+    const istpDescription = `
+Adventurous.Spontaneous.Competitive.Observant.
+`;
+
     return queryInterface.bulkInsert('PTypes', [
       { name: 'enfj', description: 'Profile Type Description Goes Here', createdAt: new Date(), updatedAt: new Date() },
       { name: 'enfp', description: 'Profile Type Description Goes Here', createdAt: new Date(), updatedAt: new Date() },
